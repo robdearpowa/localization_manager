@@ -4,6 +4,9 @@ import PySimpleGUI as gui
 
 from typing import Union
 
+
+ARB_FILETYPE = (("File di localizzazione", "*.arb"),)
+
 def repack(widget, fill, expand, before=None):
     pack_info = widget.pack_info()
     pack_info.update({'fill':fill, 'expand':expand, 'before':before})
@@ -14,6 +17,7 @@ class App:
     def __init__(self) -> None:
         self.running: bool = False
         self.arb_data: Union[dict, None] = None
+        self.current_arbfile_path: Union[str, None] = None
 
         gui.LOOK_AND_FEEL_TABLE["Marketwall"] = {
             "BACKGROUND": "#424242",
@@ -31,21 +35,17 @@ class App:
 
         input_background = gui.theme_input_background_color()
 
+        menu_layout = [
+            ["&File", ['&Apri File ARB::-MENUOPEN-', '&Salva::-MENUSAVE-', 'Salva come...::-MENUSAVEAS-']]
+        ]
+
         self.layout: list[list] = [
-            [gui.Text("Seleziona il file di lingue")],
-            [gui.Input(key="-INPARBFILE-", 
-                       expand_x=True, 
-                       readonly=True, 
-                       disabled_readonly_background_color=input_background, 
-                       enable_events=True),
-             gui.FileBrowse("Scegli file",
-                            target="-INPARBFILE-",
-                            enable_events=True,
-                            file_types=(("File di localizzazione", "*.arb"),)),],
+            [gui.Menu(menu_layout)],
             [gui.Text("Cerca")],
             [gui.Input(key="-INPSEARCH-", enable_events=True, expand_x=True)],
             [gui.Listbox([], key="-LBXSTRINGS-", expand_y=True, expand_x=False, enable_events=True, horizontal_scroll=True, size=(40, None)), 
-             gui.Multiline(key="-MTLCURRENTSTRING-", expand_x=True, expand_y=True, enable_events=True,)]
+             gui.Multiline(key="-MTLCURRENTSTRING-", expand_x=True, expand_y=True, enable_events=True,)],
+            [gui.Text("Seleziona il file di lingue", key="-TXTRESULT-")],
         ]
 
         self.window: gui.Window = gui.Window(
@@ -62,11 +62,10 @@ class App:
 
         # Valorizzazione componenti
 
-        
-        self.inp_arbfile: gui.Input = self.window["-INPARBFILE-"] # type: ignore
         self.lbx_strings: gui.Listbox = self.window["-LBXSTRINGS-"] #type: ignore
         self.inp_current_string: gui.Multiline = self.window["-MTLCURRENTSTRING-"] #type: ignore
         self.inp_search: gui.Input = self.window["-INPSEARCH-"] #type: ignore
+        self.txt_result: gui.Text = self.window["-TXTRESULT-"]
 
         repack(self.lbx_strings.Widget,        'y', 0)
         repack(self.lbx_strings.Widget.master, 'y', 0, self.inp_current_string.Widget.master)
@@ -80,12 +79,19 @@ class App:
             data = self.window.read()
             if data:
                 event, values = data
-
+                
                 if event == gui.WIN_CLOSED or event == "Cancel":
                     self.running = False
+                    continue
 
-                if event == self.inp_arbfile.key:
-                    self.load_arbfile()
+                if event.endswith("-MENUOPEN-"):
+                    self.open_arbfile()
+                    
+                if event.endswith("-MENUSAVE-"):
+                    self.save_arbfile(self.current_arbfile_path)
+                    
+                if event.endswith("-MENUSAVEAS-"):
+                    self.save_arbfile_as()
 
                 if event == self.lbx_strings.key:
                     self.load_current_string(values[event])
@@ -97,13 +103,53 @@ class App:
                     self.search(values[event])
         pass
 
+    def open_arbfile(self) -> None:
+        file_path = gui.popup_get_file("Apri un File Localizzazione ARB",
+                                       file_types=ARB_FILETYPE,
+                                       default_path=self.current_arbfile_path,
+                                       keep_on_top=True)
+        
+        if not file_path:
+            return
+        
+        self.current_arbfile_path = file_path
+        self.txt_result.update("Aprendo file... {self.current_arbfile_path}")
+        self.load_arbfile(self.current_arbfile_path)
+        
+        self.txt_result.update(f"Aperto file: {self.current_arbfile_path}")
+
+        pass
+    
+    def save_arbfile(self, file_path: Union[str, None]) -> None:
+        if not file_path or not self.arb_data:
+            return
+        
+        self.txt_result.update("Salvando file... {file_path}")
+        with open(file_path, "w+") as arbfile:
+            json.dump(self.arb_data, arbfile)
+            self.txt_result.update(f"Salvato file: {file_path}")
+        pass
+            
+    def save_arbfile_as(self) -> None:
+        file_path = gui.popup_get_file("Salva il File di Localizzazione",
+                                       file_types=ARB_FILETYPE,
+                                       default_path=self.current_arbfile_path,
+                                       save_as=True,
+                                       keep_on_top=True)
+        
+        if not file_path:
+            return
+        
+        self.current_arbfile_path = file_path
+        self.save_arbfile(self.current_arbfile_path)
+        pass
+        
+
     def get_arbfile_path(self) -> Union[str, None]:
         file_path: str = self.inp_arbfile.get()
         return file_path
 
-    def get_arbfile(self) -> Union[dict, None]:
-        file_path = self.get_arbfile_path()
-
+    def get_arbfile(self, file_path: Union[str, None]) -> Union[dict, None]:
         if not file_path:
             return None
 
@@ -116,8 +162,8 @@ class App:
             arbfile_content: dict = json.load(arbfile)
             return arbfile_content
 
-    def load_arbfile(self) -> None:
-        self.arb_data = self.get_arbfile()
+    def load_arbfile(self, file_path: Union[str, None]) -> None:
+        self.arb_data = self.get_arbfile(file_path)
 
         if not self.arb_data:
             print("File non valido")
