@@ -35,15 +35,32 @@ class App:
 
         input_background = gui.theme_input_background_color()
 
+        modify_menu = ["&Rinomina stringa  (Crtl+R)::-MENURENAMESTRING-",
+                                "&Aggiungi stringa   (Crtl+A)::-MENUADDSTRING-",
+                                "&Inserisci stringa   (Crtl+I)::-MENUINSERTSTRING-",
+                                "&Duplica stringa    (Crtl+D)::-MENUDUPESTRING-",
+                                "&Rimuovi stringa::-MENUREMOVESTRING-",]
+
         menu_layout = [
-            ["&File", ['&Apri File ARB::-MENUOPEN-', '&Salva::-MENUSAVE-', 'Salva come...::-MENUSAVEAS-']]
+            ["&File", ['&Apri File ARB (Crtl+O)::-MENUOPEN-',
+                       '&Salva             (Ctrl+S)::-MENUSAVE-',
+                       'Salva come...::-MENUSAVEAS-']],
+            ["&Modifica", modify_menu]
         ]
+        
+        lbx_right_click_menu = ["&Right", modify_menu]
 
         self.layout: list[list] = [
             [gui.Menu(menu_layout)],
             [gui.Text("Cerca")],
             [gui.Input(key="-INPSEARCH-", enable_events=True, expand_x=True)],
-            [gui.Listbox([], key="-LBXSTRINGS-", expand_y=True, expand_x=False, enable_events=True, horizontal_scroll=True, size=(40, None)), 
+            [gui.Listbox([], key="-LBXSTRINGS-",
+                         expand_y=True,
+                         expand_x=False,
+                         enable_events=True,
+                         horizontal_scroll=True,
+                         size=(40, None),
+                         right_click_menu=lbx_right_click_menu), 
              gui.Multiline(key="-MTLCURRENTSTRING-", expand_x=True, expand_y=True, enable_events=True,)],
             [gui.Text("Seleziona il file di lingue", key="-TXTRESULT-")],
         ]
@@ -55,6 +72,16 @@ class App:
         )
 
         self.window.finalize()
+        #Shortcut menu file
+        self.window.bind("<Control_L><o>", "-MENUOPEN-")
+        self.window.bind("<Control_L><s>", "-MENUSAVE-")
+        
+        #Shortcut menu modifica
+        self.window.bind("<Control_L><r>", "-MENURENAMESTRING-")
+        self.window.bind("<Control_L><a>", "-MENUADDSTRING-")
+        self.window.bind("<Control_L><i>", "-MENUINSERTSTRING-")
+        self.window.bind("<Control_L><d>", "-MENUDUPESTRING-")
+
 
         w, h = self.window.size
 
@@ -92,6 +119,15 @@ class App:
                     
                 if event.endswith("-MENUSAVEAS-"):
                     self.save_arbfile_as()
+                    
+                if event.endswith("-MENURENAMESTRING-"):
+                    self.rename_string()
+                    
+                if event.endswith("-MENUADDSTRING-"):
+                    self.add_string()
+                    
+                if event.endswith("-MENURENAMESTRING-"):
+                    self.rename_string()
 
                 if event == self.lbx_strings.key:
                     self.load_current_string(values[event])
@@ -121,7 +157,11 @@ class App:
         pass
     
     def save_arbfile(self, file_path: Union[str, None]) -> None:
-        if not file_path or not self.arb_data:
+        if not self.arb_data:
+            self.arb_data = {}
+        
+        if not file_path or not os.path.exists(file_path):
+            self.save_arbfile_as()
             return
         
         self.txt_result.update("Salvando file... {file_path}")
@@ -231,6 +271,41 @@ class App:
 
         self.lbx_strings.update(self.arb_data.keys())
         self.load_current_string(self.lbx_strings.get())
+        
+    def add_string(self, rename_string: Union[str, None]=None) -> None:
+        string_key = gui.popup_get_text("Rinomina una nuova stringa" if rename_string else "Aggiungi una nuova stringa",
+                                        default_text=rename_string)
+        
+        if not self.arb_data:
+            self.arb_data = {}
+            
+        if string_key in self.arb_data.keys():
+            self.txt_result.update("Impossibile creare la stringa: Stringa già esistente")
+            return
+        
+        if not string_key:
+            self.txt_result.update("Impossibile creare la stringa: Operazione annullata")
+            return
+        
+        data = ""
+        if rename_string:
+            data = self.arb_data.pop(rename_string)
+            
+        self.arb_data[string_key] = data
+        
+        self.reset_list()
+            
+        
+        pass
+    
+    def rename_string(self) -> None:
+        selected_strings = self.lbx_strings.get()
+        
+        if not selected_strings or len(selected_strings) == 0:
+            self.txt_result.update("Impossibile rinominare la stringa: Nessuna stringa selezionata")
+            return
+        
+        self.add_string(selected_strings[0])
 
 if __name__ == "__main__":
     app = App()
