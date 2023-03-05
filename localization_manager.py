@@ -4,6 +4,11 @@ import PySimpleGUI as gui
 
 from typing import Union
 
+def repack(widget, fill, expand, before=None):
+    pack_info = widget.pack_info()
+    pack_info.update({'fill':fill, 'expand':expand, 'before':before})
+    widget.pack(**pack_info)
+
 
 class App:
     def __init__(self) -> None:
@@ -33,11 +38,14 @@ class App:
                        readonly=True, 
                        disabled_readonly_background_color=input_background, 
                        enable_events=True),
-             gui.FileBrowse(target="-INPARBFILE-",
+             gui.FileBrowse("Scegli file",
+                            target="-INPARBFILE-",
                             enable_events=True,
                             file_types=(("File di localizzazione", "*.arb"),)),],
-            [gui.Listbox([], key="-LBXSTRINGS-", expand_y=True, expand_x=False, enable_events=True, size=(30, None), horizontal_scroll=True), 
-             gui.Multiline(key="-MTLCURRENTSTRING-", expand_x=True, expand_y=True, enable_events=True)]
+            [gui.Text("Cerca")],
+            [gui.Input(key="-INPSEARCH-", enable_events=True, expand_x=True)],
+            [gui.Listbox([], key="-LBXSTRINGS-", expand_y=True, expand_x=False, enable_events=True, horizontal_scroll=True, size=(40, None)), 
+             gui.Multiline(key="-MTLCURRENTSTRING-", expand_x=True, expand_y=True, enable_events=True,)]
         ]
 
         self.window: gui.Window = gui.Window(
@@ -50,7 +58,7 @@ class App:
 
         w, h = self.window.size
 
-        self.window.set_min_size((w, 300))
+        self.window.set_min_size((w, 400))
 
         # Valorizzazione componenti
 
@@ -58,6 +66,10 @@ class App:
         self.inp_arbfile: gui.Input = self.window["-INPARBFILE-"] # type: ignore
         self.lbx_strings: gui.Listbox = self.window["-LBXSTRINGS-"] #type: ignore
         self.inp_current_string: gui.Multiline = self.window["-MTLCURRENTSTRING-"] #type: ignore
+        self.inp_search: gui.Input = self.window["-INPSEARCH-"] #type: ignore
+
+        repack(self.lbx_strings.Widget,        'y', 0)
+        repack(self.lbx_strings.Widget.master, 'y', 0, self.inp_current_string.Widget.master)
         pass
 
     def start(self) -> None:
@@ -80,6 +92,9 @@ class App:
 
                 if event == self.inp_current_string.key:
                     self.save_current_string(values[self.lbx_strings.key], values[event])
+
+                if event == self.inp_search.key:
+                    self.search(values[event])
         pass
 
     def get_arbfile_path(self) -> Union[str, None]:
@@ -144,6 +159,32 @@ class App:
         self.arb_data[string_key] = current_string
         pass
 
+    def search(self, search_term: Union[str, None]) -> None:
+        if not search_term:
+            self.reset_list()
+            return
+
+        search_term = search_term.rstrip().lower()
+
+        if len(search_term) == 0:
+            self.reset_list()
+            return
+
+        if not self.arb_data:
+            return
+
+        result = [(k, v) for k, v in self.arb_data.items() if search_term in k.lower() or search_term in v.lower()]
+        filtered_arb = dict(result)
+
+        self.lbx_strings.update(filtered_arb.keys())
+        self.load_current_string(self.lbx_strings.get())
+        
+    def reset_list(self) -> None:
+        if not self.arb_data:
+            return
+
+        self.lbx_strings.update(self.arb_data.keys())
+        self.load_current_string(self.lbx_strings.get())
 
 if __name__ == "__main__":
     app = App()
