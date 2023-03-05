@@ -1,0 +1,1 @@
+python -m nuitka localization_manager.py --standalone --output-dir=dist
