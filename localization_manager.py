@@ -1,6 +1,7 @@
 import os
 import json
 import PySimpleGUI as gui
+import tkinter as tk
 
 from typing import Union
 
@@ -92,10 +93,14 @@ class App:
         self.lbx_strings: gui.Listbox = self.window["-LBXSTRINGS-"] #type: ignore
         self.inp_current_string: gui.Multiline = self.window["-MTLCURRENTSTRING-"] #type: ignore
         self.inp_search: gui.Input = self.window["-INPSEARCH-"] #type: ignore
-        self.txt_result: gui.Text = self.window["-TXTRESULT-"]
+        self.txt_result: gui.Text = self.window["-TXTRESULT-"] #type: ignore
 
-        repack(self.lbx_strings.Widget,        'y', 0)
-        repack(self.lbx_strings.Widget.master, 'y', 0, self.inp_current_string.Widget.master)
+        lbx_strings_widget: Union[tk.Widget, None] = self.lbx_strings.Widget #type: ignore
+        inp_current_string_widget: Union[tk.Widget, None] = self.inp_current_string.Widget #type: ignore
+        
+        if lbx_strings_widget and inp_current_string_widget:
+            repack(lbx_strings_widget,        'y', 0)
+            repack(lbx_strings_widget.master, 'y', 0, inp_current_string_widget.master)
         pass
 
     def start(self) -> None:
@@ -142,7 +147,7 @@ class App:
     def open_arbfile(self) -> None:
         file_path = gui.popup_get_file("Apri un File Localizzazione ARB",
                                        file_types=ARB_FILETYPE,
-                                       default_path=self.current_arbfile_path,
+                                       default_path=self.current_arbfile_path if self.current_arbfile_path else "",
                                        keep_on_top=True)
         
         if not file_path:
@@ -160,12 +165,12 @@ class App:
         if not self.arb_data:
             self.arb_data = {}
         
-        if not file_path or not os.path.exists(file_path):
+        if not file_path:
             self.save_arbfile_as()
             return
         
         self.txt_result.update("Salvando file... {file_path}")
-        with open(file_path, "w+") as arbfile:
+        with open(file_path, "w+", encoding="utf-8") as arbfile:
             json.dump(self.arb_data, arbfile)
             self.txt_result.update(f"Salvato file: {file_path}")
         pass
@@ -173,7 +178,7 @@ class App:
     def save_arbfile_as(self) -> None:
         file_path = gui.popup_get_file("Salva il File di Localizzazione",
                                        file_types=ARB_FILETYPE,
-                                       default_path=self.current_arbfile_path,
+                                       default_path=self.current_arbfile_path if self.current_arbfile_path else "",
                                        save_as=True,
                                        keep_on_top=True)
         
@@ -183,11 +188,6 @@ class App:
         self.current_arbfile_path = file_path
         self.save_arbfile(self.current_arbfile_path)
         pass
-        
-
-    def get_arbfile_path(self) -> Union[str, None]:
-        file_path: str = self.inp_arbfile.get()
-        return file_path
 
     def get_arbfile(self, file_path: Union[str, None]) -> Union[dict, None]:
         if not file_path:
@@ -198,7 +198,7 @@ class App:
         if not file_exist:
             return None
 
-        with open(file_path) as arbfile:
+        with open(file_path, encoding="utf-8") as arbfile:
             arbfile_content: dict = json.load(arbfile)
             return arbfile_content
 
@@ -274,7 +274,7 @@ class App:
         
     def add_string(self, rename_string: Union[str, None]=None) -> None:
         string_key = gui.popup_get_text("Rinomina una nuova stringa" if rename_string else "Aggiungi una nuova stringa",
-                                        default_text=rename_string)
+                                        default_text=rename_string if rename_string else "")
         
         if not self.arb_data:
             self.arb_data = {}
