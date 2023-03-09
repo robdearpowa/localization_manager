@@ -125,6 +125,8 @@
      <string>File</string>
     </property>
     <addaction name="act_open_arb"/>
+    <addaction name="act_save_arb"/>
+    <addaction name="act_save_arb_as"/>
    </widget>
    <widget class="QMenu" name="menuModifica">
     <property name="title">
@@ -141,6 +143,25 @@
    </property>
    <property name="text">
     <string>Apri File ARB</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="act_save_arb">
+   <property name="text">
+    <string>Salva</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="act_save_arb_as">
+   <property name="text">
+    <string>Salva con nome...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
  </widget>
