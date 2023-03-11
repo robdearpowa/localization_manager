@@ -10,313 +10,6 @@
     <height>489</height>
    </rect>
   </property>
-  <property name="palette">
-	<palette>
-	 <active>
-	  <colorrole role="WindowText">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>255</red>
-	     <green>255</green>
-	     <blue>255</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Button">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>26</red>
-	     <green>95</green>
-	     <blue>180</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Text">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>255</red>
-	     <green>255</green>
-	     <blue>255</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="ButtonText">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>255</red>
-	     <green>255</green>
-	     <blue>255</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Base">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>36</red>
-	     <green>31</green>
-	     <blue>49</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Window">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>61</red>
-	     <green>56</green>
-	     <blue>70</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Highlight">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>53</red>
-	     <green>132</green>
-	     <blue>228</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="HighlightedText">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>255</red>
-	     <green>255</green>
-	     <blue>255</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="AlternateBase">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>94</red>
-	     <green>92</green>
-	     <blue>100</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="ToolTipBase">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>119</red>
-	     <green>118</green>
-	     <blue>123</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="ToolTipText">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>255</red>
-	     <green>255</green>
-	     <blue>255</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	 </active>
-	 <inactive>
-	  <colorrole role="WindowText">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>255</red>
-	     <green>255</green>
-	     <blue>255</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Button">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>26</red>
-	     <green>95</green>
-	     <blue>180</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Text">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>255</red>
-	     <green>255</green>
-	     <blue>255</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="ButtonText">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>255</red>
-	     <green>255</green>
-	     <blue>255</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Base">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>36</red>
-	     <green>31</green>
-	     <blue>49</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Window">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>61</red>
-	     <green>56</green>
-	     <blue>70</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Highlight">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>53</red>
-	     <green>132</green>
-	     <blue>228</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="HighlightedText">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>255</red>
-	     <green>255</green>
-	     <blue>255</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="AlternateBase">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>94</red>
-	     <green>92</green>
-	     <blue>100</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="ToolTipBase">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>119</red>
-	     <green>118</green>
-	     <blue>123</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="ToolTipText">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>255</red>
-	     <green>255</green>
-	     <blue>255</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	 </inactive>
-	 <disabled>
-	  <colorrole role="WindowText">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>190</red>
-	     <green>190</green>
-	     <blue>190</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Button">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>26</red>
-	     <green>95</green>
-	     <blue>180</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Text">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>190</red>
-	     <green>190</green>
-	     <blue>190</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="ButtonText">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>190</red>
-	     <green>190</green>
-	     <blue>190</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Base">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>61</red>
-	     <green>56</green>
-	     <blue>70</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Window">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>61</red>
-	     <green>56</green>
-	     <blue>70</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="Highlight">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>145</red>
-	     <green>145</green>
-	     <blue>145</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="HighlightedText">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>255</red>
-	     <green>255</green>
-	     <blue>255</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="AlternateBase">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>94</red>
-	     <green>92</green>
-	     <blue>100</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="ToolTipBase">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>119</red>
-	     <green>118</green>
-	     <blue>123</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	  <colorrole role="ToolTipText">
-	   <brush brushstyle="SolidPattern">
-	    <color alpha="255">
-	     <red>255</red>
-	     <green>255</green>
-	     <blue>255</blue>
-	    </color>
-	   </brush>
-	  </colorrole>
-	 </disabled>
-	</palette>
-  </property>
   <property name="windowTitle">
    <string>Gestore Localizzazione</string>
   </property>
@@ -409,7 +102,11 @@
     <item>
      <layout class="QFormLayout" name="formLayout">
       <item row="0" column="0">
-       <widget class="QListWidget" name="lsw_strings"/>
+       <widget class="QListWidget" name="lsw_strings">
+        <property name="contextMenuPolicy">
+         <enum>Qt::ActionsContextMenu</enum>
+        </property>
+       </widget>
       </item>
       <item row="0" column="1">
        <widget class="QPlainTextEdit" name="inp_string_content"/>
@@ -427,7 +124,7 @@
      <height>27</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="mnu_file">
     <property name="title">
      <string>File</string>
     </property>
@@ -435,13 +132,16 @@
     <addaction name="act_save_arb"/>
     <addaction name="act_save_arb_as"/>
    </widget>
-   <widget class="QMenu" name="menuModifica">
+   <widget class="QMenu" name="mnu_modifica">
     <property name="title">
      <string>Modifica</string>
     </property>
+    <addaction name="act_new_string"/>
+    <addaction name="act_delete_string"/>
+    <addaction name="act_rename_string"/>
    </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuModifica"/>
+   <addaction name="mnu_file"/>
+   <addaction name="mnu_modifica"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="act_open_arb">
@@ -469,6 +169,30 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="act_new_string">
+   <property name="text">
+    <string>Nuova Stringa</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="act_delete_string">
+   <property name="text">
+    <string>Elimina Stringa</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="act_rename_string">
+   <property name="text">
+    <string>Rinomina Stringa</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>
