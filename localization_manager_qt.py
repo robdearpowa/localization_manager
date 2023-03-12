@@ -16,6 +16,7 @@ class App(QApplication):
         self.current_arbfile_path: Union[str, None] = None
         self.arb_data: Union[dict, None] = None
         self.translator: Translator = Translator()
+        self.entry_to_copy: Union[tuple[str, str]] = None
         
         #window
         self.window: QMainWindow = uic.loadUi("localization_manager.ui")
@@ -42,6 +43,8 @@ class App(QApplication):
         self.act_new_string: QAction = self.window.findChild(QAction, "act_new_string")
         self.act_rename_string: QAction = self.window.findChild(QAction, "act_rename_string")
         self.act_delete_string: QAction = self.window.findChild(QAction, "act_delete_string")
+        self.act_copy_string: QAction = self.window.findChild(QAction, "act_copy_string")
+        self.act_paste_string: QAction = self.window.findChild(QAction, "act_paste_string")
         
         #btn
         self.btn_translate: QPushButton = self.window.findChild(QPushButton, "btn_translate")
@@ -65,6 +68,8 @@ class App(QApplication):
         self.act_new_string.triggered.connect(self.new_string)
         self.act_rename_string.triggered.connect(self.rename_string)
         self.act_delete_string.triggered.connect(self.delete_string)
+        self.act_copy_string.triggered.connect(self.copy_string)
+        self.act_paste_string.triggered.connect(self.paste_string)
         
         #btn
         self.btn_translate.clicked.connect(self.translate)
@@ -305,9 +310,7 @@ class App(QApplication):
             print("No arb data")
             return
         
-        selected_items: Union[list[QListWidgetItem], None] = self.lsw_strings.selectedItems()
-        
-        current_item: Union[QListWidgetItem, None] = selected_items[0] if selected_items else None
+        current_item: Union[QListWidgetItem, None] = self.lsw_strings.currentItem()
         current_key: Union[str, None] = current_item.text() if current_item else None
         
         if not current_key:
@@ -319,6 +322,50 @@ class App(QApplication):
         self.reset_list()
         self.inp_string_content.setPlainText("")
         print("Hello delete string")
+        pass
+    
+    def copy_string(self) -> None:
+        print("Hello copy")
+        current_item = self.lsw_strings.currentItem()
+        
+        
+        if self.arb_data == None or current_item == None:
+            return
+        
+        current_key = current_item.text()
+        current_value = self.arb_data[current_key]
+        
+        self.entry_to_copy = (current_key, current_value)
+        pass
+    
+    def paste_string(self) -> None:
+        print("Hello paste")
+        
+        if self.entry_to_copy == None:
+            return
+        
+        new_string_name, value = self.entry_to_copy
+        
+        while True:
+            if new_string_name not in self.arb_data.keys():
+                break
+            print("This string already exist")
+            new_string_name = f"{new_string_name} copy"
+                
+        current_item: Union[QListWidgetItem, None] = self.lsw_strings.currentItem()
+        current_key: Union[str, None] = current_item.text() if current_item else None
+        current_pos: Union[int, None] = list(self.arb_data.keys()).index(current_key) if current_key else None
+        
+        items = list(self.arb_data.items())
+        
+        if current_pos:
+            items.insert(current_pos + 1, (new_string_name, value))
+            self.arb_data = dict(items)
+        else:
+            self.arb_data[new_string_name] = value
+            
+        self.reset_list()
+        self.inp_string_content.setPlainText("")
         pass
     
     def alert_user(self, message: str) -> None:

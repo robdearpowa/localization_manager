@@ -139,6 +139,8 @@
     <addaction name="act_new_string"/>
     <addaction name="act_delete_string"/>
     <addaction name="act_rename_string"/>
+    <addaction name="act_copy_string"/>
+    <addaction name="act_paste_string"/>
    </widget>
    <addaction name="mnu_file"/>
    <addaction name="mnu_modifica"/>
@@ -193,6 +195,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="act_copy_string">
+   <property name="text">
+    <string>Copia Stringa</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="act_paste_string">
+   <property name="text">
+    <string>Incolla Stringa</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
    </property>
   </action>
  </widget>
