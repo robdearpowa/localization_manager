@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import *
 from PyQt5 import uic
 
 from typing import Union
+from googletrans import Translator
     
 
 class App(QApplication):
@@ -14,6 +15,7 @@ class App(QApplication):
         super(App, self).__init__(argv)
         self.current_arbfile_path: Union[str, None] = None
         self.arb_data: Union[dict, None] = None
+        self.translator: Translator = Translator()
         
         #window
         self.window: QMainWindow = uic.loadUi("localization_manager.ui")
@@ -25,6 +27,10 @@ class App(QApplication):
         self.inp_search: QLineEdit = self.window.findChild(QLineEdit, "inp_search")
         self.inp_string_content: QPlainTextEdit = self.window.findChild(QPlainTextEdit, "inp_string_content")
         self.inp_search: QLineEdit = self.window.findChild(QLineEdit, "inp_search")
+        
+        #cmb
+        self.cmb_from: QComboBox = self.window.findChild(QComboBox, "cmb_from")
+        self.cmb_to: QComboBox = self.window.findChild(QComboBox, "cmb_to")
         
         #lsw
         self.lsw_strings: QListWidget = self.window.findChild(QListWidget, "lsw_strings")
@@ -107,6 +113,7 @@ class App(QApplication):
         #self.txt_result.update("Salvando file... {file_path}")
         with open(self.current_arbfile_path, "w+", encoding="utf-8") as arbfile:
             json.dump(self.arb_data, arbfile)
+            self.alert_user(f"File salvato: {self.current_arbfile_path}")
             #self.txt_result.update(f"Salvato file: {file_path}")
         pass
 
@@ -178,6 +185,8 @@ class App(QApplication):
         if strings == None:
             return
         
+        self.lsw_strings.setCurrentItem(None)
+        
         rows = self.lsw_strings.count()
         
         for i in range(rows):
@@ -246,6 +255,47 @@ class App(QApplication):
         pass
     
     def rename_string(self) -> None:
+        if self.arb_data == None:
+            return
+        
+        current_item = self.lsw_strings.currentItem()
+        
+        if not current_item:
+            self.alert_user("Nessuna stringa selezionata")
+            return
+        
+        current_string = self.arb_data[current_item.text()]
+            
+            
+        new_string_name = self.text_from_user("Rinomina String", current_item.text())
+        
+        #L'utente ha annullato l'operazione
+        if new_string_name == None:
+            return
+        
+        if not new_string_name:
+            self.alert_user("Nome della stringa non valido")
+            return
+        
+        if new_string_name in self.arb_data.keys():
+            self.alert_user("Questa stringa già esiste")
+            print("This string already exist")
+            return
+            
+        current_key: Union[str, None] = current_item.text() if current_item else None
+        current_pos: Union[int, None] = list(self.arb_data.keys()).index(current_key) if current_key else None
+        
+        items = list(self.arb_data.items())
+        
+        if not current_pos:
+            self.alert_user("Posizione stringa non valida")
+            return
+        
+        items.pop(current_pos)
+        items.insert(current_pos, (new_string_name, current_string))
+        self.arb_data = dict(items)
+            
+        self.reset_list()
         print("Hello rename string")
         pass
     
@@ -280,9 +330,37 @@ class App(QApplication):
         return result.strip() if ok else None
     
     def translate(self) -> None:
-        print("Hello Translate")
-        pass
-    
+        lang_from = self.cmb_from.currentText()
+        lang_to = self.cmb_to.currentText()
+        
+        current_string = self.inp_string_content.toPlainText()
+        
+        
+        if not lang_to:
+            self.alert_user("Nessuna traduzione selezionata")
+            return
+
+        current_string = current_string.strip() if current_string else ""
+
+        if len(current_string) == 0:
+            self.alert_user("Impossibile tradurre una stringa vuota")
+            return
+
+        try:
+            response = self.translator.translate(
+                text=current_string,
+                src=lang_from if lang_from and len(
+                    lang_from.strip()) > 0 else "auto",
+                dest=lang_to,
+            )
+
+            if not response:
+                return
+            
+            self.inp_string_content.setPlainText(response.text)
+        finally:
+            pass
+
 if __name__ == "__main__":
     app = App(sys.argv)
     app.start()
