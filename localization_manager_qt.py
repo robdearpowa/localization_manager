@@ -49,7 +49,7 @@ class App(QApplication):
         self.inp_search.textChanged.connect(self.search)
         
         #lsw
-        self.lsw_strings.itemClicked.connect(self.load_current_string)
+        self.lsw_strings.currentItemChanged.connect(self.load_current_string)
         self.lsw_strings.addActions(self.mnu_modifica.actions())
         
         #act
@@ -124,9 +124,9 @@ class App(QApplication):
         self.save_arbfile()
         pass
     
-    def load_current_string(self, selected_item: QListWidgetItem) ->None:
+    def load_current_string(self, selected_item: QListWidgetItem, prev_item: QListWidgetItem) -> None:
 
-        if self.arb_data == None:
+        if self.arb_data == None or selected_item == None:
             return
 
         string_data = self.arb_data[selected_item.text()]
@@ -139,18 +139,19 @@ class App(QApplication):
         
     def save_current_string(self) -> None:
         current_string = self.inp_string_content.toPlainText()
-        selected_items = self.lsw_strings.selectedItems()
+        current_item = self.lsw_strings.currentItem()
 
-        if not selected_items or len(selected_items) == 0 or not current_string:
+        if current_item == None or current_string == None:
             return
 
         if self.arb_data == None:
             return
 
         # Prendo solo la prima stringa selezionata
-        string_key = selected_items[0].text()
+        string_key = current_item.text()
 
         self.arb_data[string_key] = current_string
+        print(f"saving string {string_key}")
         pass
 
     
