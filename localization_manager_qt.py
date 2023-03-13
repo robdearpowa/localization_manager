@@ -406,11 +406,11 @@ class App(QApplication):
         print("Hello check changes")
         event.ignore()
         
-        result = True
+        result = False
         if self.arb_data != self.original_arb_data:
             result = self.ask_user("Hai delle modifiche non salvate, vuoi salvare?") == QMessageBox.Yes
             
-        if result:
+        if result: 
             self.save_arbfile()
         
         event.accept()
