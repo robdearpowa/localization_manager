@@ -248,7 +248,7 @@ class App(QApplication):
         
         items = list(self.arb_data.items())
         
-        if current_pos:
+        if current_pos != None:
             items.insert(current_pos + 1, (new_string_name, ""))
             self.arb_data = dict(items)
         else:
@@ -292,7 +292,7 @@ class App(QApplication):
         
         items = list(self.arb_data.items())
         
-        if not current_pos:
+        if current_pos == None:
             self.alert_user("Posizione stringa non valida")
             return
         
@@ -313,7 +313,7 @@ class App(QApplication):
         current_item: Union[QListWidgetItem, None] = self.lsw_strings.currentItem()
         current_key: Union[str, None] = current_item.text() if current_item else None
         
-        if not current_key:
+        if current_key == None:
             self.alert_user("Nessuna stringa selezionata da eliminare")
             print("No key to delete")
             return
@@ -358,7 +358,7 @@ class App(QApplication):
         
         items = list(self.arb_data.items())
         
-        if current_pos:
+        if current_pos != None:
             items.insert(current_pos + 1, (new_string_name, value))
             self.arb_data = dict(items)
         else:
