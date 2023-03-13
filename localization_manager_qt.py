@@ -8,6 +8,7 @@ from PyQt5 import uic
 
 from typing import Union
 from googletrans import Translator
+from pathlib import Path
     
 
 class App(QApplication):
@@ -17,6 +18,7 @@ class App(QApplication):
         self.arb_data: Union[dict, None] = None
         self.translator: Translator = Translator()
         self.entry_to_copy: Union[tuple[str, str]] = None
+        self.original_arb_data: Union[dict, None] = None
         
         #window
         self.window: QMainWindow = uic.loadUi("localization_manager.ui")
@@ -52,6 +54,9 @@ class App(QApplication):
         pass
     
     def start(self) -> None:
+        
+        #window
+        self.window.closeEvent = self.check_changes
             
         #inp
         self.inp_string_content.textChanged.connect(self.save_current_string)
@@ -102,6 +107,7 @@ class App(QApplication):
             return
 
         print(self.arb_data)
+        self.original_arb_data = self.arb_data.copy()
 
         self.reset_list()
         self.inp_string_content.setPlainText("")
@@ -119,6 +125,8 @@ class App(QApplication):
         with open(self.current_arbfile_path, "w+", encoding="utf-8") as arbfile:
             json.dump(self.arb_data, arbfile, sort_keys=False, indent=2, ensure_ascii=False)
             self.alert_user(f"File salvato: {self.current_arbfile_path}")
+            self.original_arb_data = self.arb_data.copy()
+            self.update_window_title()
             #self.txt_result.update(f"Salvato file: {file_path}")
         pass
 
@@ -163,6 +171,7 @@ class App(QApplication):
         string_key = current_item.text()
 
         self.arb_data[string_key] = current_string
+        self.update_window_title()
         print(f"saving string {string_key}")
         pass
 
@@ -197,6 +206,7 @@ class App(QApplication):
         for i in range(rows):
             self.lsw_strings.takeItem(0)
         self.lsw_strings.addItems(strings)
+        self.update_window_title()
         pass
         
     def search(self) -> None:
@@ -372,9 +382,39 @@ class App(QApplication):
         message = QMessageBox.information(self.window, self.window.windowTitle(), message)
         pass
     
+    def ask_user(self, message: str) -> QMessageBox.StandardButton:
+        result = QMessageBox.information(self.window, self.window.windowTitle(), message, QMessageBox.Yes|QMessageBox.No)
+        return result
+    
     def text_from_user(self, message: str, text: str = "") -> Union[str, None]:
         result, ok = QInputDialog.getText(self.window, self.window.windowTitle(), message, text=text)
         return result.strip() if ok else None
+    
+    def update_window_title(self) -> None:
+        
+        file_name = ""
+        
+        if self.current_arbfile_path != None:
+            file_name = Path(self.current_arbfile_path).stem
+            
+        if self.arb_data != self.original_arb_data:
+            self.window.setWindowTitle(f"Gestore Localizzazione {file_name}*")
+        else:
+            self.window.setWindowTitle(f"Gestore Localizzazione {file_name}")
+            
+    def check_changes(self, event) -> None:
+        print("Hello check changes")
+        event.ignore()
+        
+        result = True
+        if self.arb_data != self.original_arb_data:
+            result = self.ask_user("Hai delle modifiche non salvate, vuoi salvare?") == QMessageBox.Yes
+            
+        if result:
+            self.save_arbfile()
+        
+        event.accept()
+        pass
     
     def translate(self) -> None:
         lang_from = self.cmb_from.currentText()
