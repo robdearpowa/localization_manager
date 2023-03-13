@@ -117,7 +117,7 @@ class App(QApplication):
 
         #self.txt_result.update("Salvando file... {file_path}")
         with open(self.current_arbfile_path, "w+", encoding="utf-8") as arbfile:
-            json.dump(self.arb_data, arbfile)
+            json.dump(self.arb_data, arbfile, sort_keys=False, indent=2, ensure_ascii=False)
             self.alert_user(f"File salvato: {self.current_arbfile_path}")
             #self.txt_result.update(f"Salvato file: {file_path}")
         pass
