@@ -2,13 +2,28 @@ import sys
 import os
 import json
 
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import *
-from PyQt5 import uic
+from PySide2 import QtWidgets
+from PySide2.QtWidgets import *
+from PySide2.QtUiTools import QUiLoader
+from PySide2.QtCore import QFile, QObject, QEvent
 
 from typing import Union
 from googletrans import Translator
 from pathlib import Path
+
+class WindowManager(QObject):
+    def __init__(self, window: QMainWindow, on_close) -> None:
+        super(WindowManager, self).__init__()
+        self.window = window
+        self.on_close = on_close
+        
+    def eventFilter(self, watched, event) -> bool:
+        if watched is self.window and event.type() == QEvent.Close:
+            self.on_close()
+            event.ignore()
+            return True
+        
+        return super(WindowManager, self).eventFilter(watched, event)
     
 
 class App(QApplication):
@@ -20,8 +35,11 @@ class App(QApplication):
         self.entry_to_copy: Union[tuple[str, str]] = None
         self.original_arb_data: Union[dict, None] = None
         
+        ui_loader = QUiLoader()
+        
         #window
-        self.window: QMainWindow = uic.loadUi("localization_manager.ui")
+        self.window: QMainWindow = ui_loader.load(QFile("localization_manager.ui"))
+        self.window_manager = WindowManager(self.window, self.check_changes)
         
         #mnu
         self.mnu_modifica: QMenu = self.window.findChild(QMenu, "mnu_modifica")
@@ -56,7 +74,7 @@ class App(QApplication):
     def start(self) -> None:
         
         #window
-        self.window.closeEvent = self.check_changes
+        self.window.installEventFilter(self.window_manager)
             
         #inp
         self.inp_string_content.textChanged.connect(self.save_current_string)
@@ -382,8 +400,8 @@ class App(QApplication):
         message = QMessageBox.information(self.window, self.window.windowTitle(), message)
         pass
     
-    def ask_user(self, message: str) -> QMessageBox.StandardButton:
-        result = QMessageBox.information(self.window, self.window.windowTitle(), message, QMessageBox.Yes|QMessageBox.No)
+    def ask_user(self, message: str, buttons=QMessageBox.Yes|QMessageBox.No) -> QMessageBox.StandardButton:
+        result = QMessageBox.information(self.window, self.window.windowTitle(), message, buttons)
         return result
     
     def text_from_user(self, message: str, text: str = "") -> Union[str, None]:
@@ -402,18 +420,19 @@ class App(QApplication):
         else:
             self.window.setWindowTitle(f"Gestore Localizzazione {file_name}")
             
-    def check_changes(self, event) -> None:
+    def check_changes(self) -> None:
         print("Hello check changes")
-        event.ignore()
         
-        result = False
+        btn_clicked = None
         if self.arb_data != self.original_arb_data:
-            result = self.ask_user("Hai delle modifiche non salvate, vuoi salvare?") == QMessageBox.Yes
+            btn_clicked = self.ask_user("Hai delle modifiche non salvate, vuoi salvare? Cliccando No uscirai senza salvare", buttons=QMessageBox.Yes|QMessageBox.No|QMessageBox.Abort)
             
-        if result: 
+        if btn_clicked == QMessageBox.Yes: 
             self.save_arbfile()
         
-        event.accept()
+        if btn_clicked != QMessageBox.Abort:
+            self.window.removeEventFilter(self.window_manager)
+            self.quit()
         pass
     
     def translate(self) -> None:
