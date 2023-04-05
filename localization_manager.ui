@@ -97,6 +97,13 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QPushButton" name="btn_reload">
+        <property name="text">
+         <string>Ricarica</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
@@ -121,7 +128,7 @@
      <x>0</x>
      <y>0</y>
      <width>676</width>
-     <height>27</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="mnu_file">
@@ -141,6 +148,9 @@
     <addaction name="act_rename_string"/>
     <addaction name="act_copy_string"/>
     <addaction name="act_paste_string"/>
+    <addaction name="separator"/>
+    <addaction name="act_diff"/>
+    <addaction name="act_patch"/>
    </widget>
    <addaction name="mnu_file"/>
    <addaction name="mnu_modifica"/>
@@ -211,6 +221,16 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="act_patch">
+   <property name="text">
+    <string>Applica file ARB come patch</string>
+   </property>
+  </action>
+  <action name="act_diff">
+   <property name="text">
+    <string>Diff con file ARB</string>
    </property>
   </action>
  </widget>

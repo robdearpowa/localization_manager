@@ -38,7 +38,7 @@ class App(QApplication):
         ui_loader = QUiLoader()
         
         #window
-        self.window: QMainWindow = ui_loader.load(QFile("localization_manager.ui"))
+        self.window: QMainWindow = ui_loader.load(QFile(self.get_resource_path("localization_manager.ui")))
         self.window_manager = WindowManager(self.window, self.check_changes)
         
         #mnu
@@ -65,9 +65,12 @@ class App(QApplication):
         self.act_delete_string: QAction = self.window.findChild(QAction, "act_delete_string")
         self.act_copy_string: QAction = self.window.findChild(QAction, "act_copy_string")
         self.act_paste_string: QAction = self.window.findChild(QAction, "act_paste_string")
+        self.act_diff: QAction = self.window.findChild(QAction, "act_diff")
+        self.act_patch: QAction = self.window.findChild(QAction, "act_patch")
         
         #btn
         self.btn_translate: QPushButton = self.window.findChild(QPushButton, "btn_translate")
+        self.btn_reload: QPushButton = self.window.findChild(QPushButton, "btn_reload")
         
         pass
     
@@ -93,9 +96,12 @@ class App(QApplication):
         self.act_delete_string.triggered.connect(self.delete_string)
         self.act_copy_string.triggered.connect(self.copy_string)
         self.act_paste_string.triggered.connect(self.paste_string)
+        self.act_diff.triggered.connect(self.diff)
+        self.act_patch.triggered.connect(self.patch)
         
         #btn
         self.btn_translate.clicked.connect(self.translate)
+        self.btn_reload.clicked.connect(self.reload)
         
         self.window.show()
         sys.exit(self.exec_())
@@ -466,6 +472,73 @@ class App(QApplication):
             self.inp_string_content.setPlainText(response.text)
         finally:
             pass
+        
+    def reload(self) -> None:
+        btn_clicked = None
+        if self.arb_data != self.original_arb_data:
+            btn_clicked = self.ask_user("Hai delle modifiche non salvate, vuoi salvare? Cliccando No ricaricherai il file corrente senza salvare le modifiche apportate, Cliccando si sovrascriverai il file su disco con le modifiche attualmente presenti", buttons=QMessageBox.Yes|QMessageBox.No|QMessageBox.Abort)
+            
+        if btn_clicked == QMessageBox.Yes: 
+            self.save_arbfile()
+        
+        if btn_clicked != QMessageBox.Abort:
+            self.load_arbfile()
+        pass
+    
+    def diff(self) -> None:
+        diff_path, _ = QFileDialog.getOpenFileName(self.window, "Diff File ARB", "", "File ARB (*.arb)")
+
+        if not diff_path:
+            return
+
+        
+        result_path, _ = QFileDialog.getSaveFileName(self.window, "Diff Result File ARB", "diff_result.arb", "File ARB (*.arb)")
+        
+        if not result_path:
+            return
+        
+        with open(diff_path, "r", encoding="utf-8") as diff_arb_file:
+            diff_arb_data: dict = json.load(diff_arb_file)
+            
+            result_arb_data = {}
+            
+            for key, value in self.arb_data.items():
+                if key not in diff_arb_data:
+                    result_arb_data[key] = value
+        
+            with open(result_path, "w+", encoding="utf-8") as result_file:
+                json.dump(result_arb_data, result_file, sort_keys=False, indent=2, ensure_ascii=False)
+                pass
+            pass
+        self.current_arbfile_path = result_path
+        self.load_arbfile()
+        pass
+    
+    def patch(self) -> None:
+        patch_path, _ = QFileDialog.getOpenFileName(self.window, "Patch File ARB", "", "File ARB (*.arb)")
+
+        if not patch_path:
+            return
+        
+        with open(patch_path, "r", encoding="utf-8") as patch_arb_file:
+            patch_arb_data: dict = json.load(patch_arb_file)
+            
+            for key, value in patch_arb_data.items():
+                self.arb_data[key] = value
+                pass
+            self.reset_list()
+            self.inp_string_content.setPlainText("")
+            pass
+        pass
+    
+    def get_resource_path(self, relative_path: str) -> str:
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
 if __name__ == "__main__":
     app = App(sys.argv)
