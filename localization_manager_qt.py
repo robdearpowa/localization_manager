@@ -34,12 +34,13 @@ class App(QApplication):
         self.translator: Translator = Translator()
         self.entry_to_copy: Union[tuple[str, str]] = None
         self.original_arb_data: Union[dict, None] = None
+        self.recent: dict = {}
         
         ui_loader = QUiLoader()
         
         #window
         self.window: QMainWindow = ui_loader.load(QFile(self.get_resource_path("localization_manager.ui")))
-        self.window_manager = WindowManager(self.window, self.check_changes)
+        self.window_manager = WindowManager(self.window, self.check_changes_close)
         
         #mnu
         self.mnu_modifica: QMenu = self.window.findChild(QMenu, "mnu_modifica")
@@ -55,6 +56,7 @@ class App(QApplication):
         
         #lsw
         self.lsw_strings: QListWidget = self.window.findChild(QListWidget, "lsw_strings")
+        self.lsw_recent: QListWidget = self.window.findChild(QListWidget, "lsw_recent")
         
         #act
         self.act_open_arb: QAction = self.window.findChild(QAction, "act_open_arb")
@@ -135,6 +137,29 @@ class App(QApplication):
 
         self.reset_list()
         self.inp_string_content.setPlainText("")
+        pass
+    
+    def change_arbfile(self, selected_item: QListWidgetItem, prev_item: QListWidgetItem) -> None:
+        result = self.check_changes()
+        
+        if result is None:
+            return
+        
+        if result is True:
+            self.save_arbfile()
+            
+        file_key = selected_item.text()
+        
+        file_path = self.recent[file_key]
+        
+        if file_path is None or not os.path.exists(file_path):
+            self.alert_user("Il file non è più disponibile")
+            self.recent.pop(file_key)
+            return
+        
+        
+        self.current_arbfile_path = file_path
+        self.load_arbfile()
         pass
     
     def save_arbfile(self) -> None:
@@ -426,17 +451,28 @@ class App(QApplication):
         else:
             self.window.setWindowTitle(f"Gestore Localizzazione {file_name}")
             
-    def check_changes(self) -> None:
-        print("Hello check changes")
-        
+            
+    def check_changes(self) -> Union[bool, None]:
         btn_clicked = None
         if self.arb_data != self.original_arb_data:
             btn_clicked = self.ask_user("Hai delle modifiche non salvate, vuoi salvare? Cliccando No uscirai senza salvare", buttons=QMessageBox.Yes|QMessageBox.No|QMessageBox.Abort)
             
         if btn_clicked == QMessageBox.Yes: 
+            return True
+        
+        if btn_clicked == QMessageBox.No:
+            return False
+        
+        return None
+            
+    def check_changes_close(self) -> None:
+        print("Hello check changes")
+        
+        result = self.check_changes()
+        if result is True: 
             self.save_arbfile()
         
-        if btn_clicked != QMessageBox.Abort:
+        if result is False:
             self.window.removeEventFilter(self.window_manager)
             self.quit()
         pass
