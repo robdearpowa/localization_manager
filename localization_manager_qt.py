@@ -88,6 +88,7 @@ class App(QApplication):
         #lsw
         self.lsw_strings.currentItemChanged.connect(self.load_current_string)
         self.lsw_strings.addActions(self.mnu_modifica.actions())
+        self.lsw_recent.currentItemChanged.connect(self.change_arbfile)
         
         #act
         self.act_open_arb.triggered.connect(self.open_arbfile)
@@ -122,8 +123,11 @@ class App(QApplication):
             return
 
         self.current_arbfile_path = file_path
+        self.recent[Path(self.current_arbfile_path).stem] = self.current_arbfile_path
+        self.update_recent_list()
         #self.txt_result.update("Aprendo file... {self.current_arbfile_path}")
         self.load_arbfile()
+        
         pass
     
     def load_arbfile(self) -> None:
@@ -140,21 +144,33 @@ class App(QApplication):
         pass
     
     def change_arbfile(self, selected_item: QListWidgetItem, prev_item: QListWidgetItem) -> None:
+        
+        file_key = selected_item.text()
+        
+        if file_key is None:
+            return
+        
+        file_path = self.recent[file_key]
+        
+        if file_path == self.current_arbfile_path:
+            return
+        
         result = self.check_changes()
         
         if result is None:
+            self.lsw_recent.setCurrentItem(prev_item)
+            prev_item.setSelected(True)
+            self.lsw_recent.setFocus()
             return
         
         if result is True:
             self.save_arbfile()
             
-        file_key = selected_item.text()
-        
-        file_path = self.recent[file_key]
         
         if file_path is None or not os.path.exists(file_path):
             self.alert_user("Il file non è più disponibile")
             self.recent.pop(file_key)
+            self.update_recent_list()
             return
         
         
@@ -256,6 +272,15 @@ class App(QApplication):
             self.lsw_strings.takeItem(0)
         self.lsw_strings.addItems(strings)
         self.update_window_title()
+        pass
+    
+    def update_recent_list(self) -> None:
+        rows = self.lsw_recent.count()
+        
+        for i in range(rows):
+            self.lsw_recent.takeItem(0)
+            
+        self.lsw_recent.addItems(self.recent.keys())
         pass
         
     def search(self) -> None:
@@ -454,8 +479,13 @@ class App(QApplication):
             
     def check_changes(self) -> Union[bool, None]:
         btn_clicked = None
-        if self.arb_data != self.original_arb_data:
+        
+        is_changed = self.arb_data != self.original_arb_data
+        
+        if is_changed:
             btn_clicked = self.ask_user("Hai delle modifiche non salvate, vuoi salvare? Cliccando No uscirai senza salvare", buttons=QMessageBox.Yes|QMessageBox.No|QMessageBox.Abort)
+        else:
+            return False
             
         if btn_clicked == QMessageBox.Yes: 
             return True
